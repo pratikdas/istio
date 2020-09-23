@@ -1,0 +1,32 @@
+kind: VirtualService
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: pricing-service
+  namespace: default
+spec:
+  hosts:
+    - pricing-service.default.svc.cluster.local
+  http:
+    - route:
+        - destination:
+            host: pricing-service.default.svc.cluster.local
+            subset: old
+          weight: 90
+        - destination:
+            host: pricing-service.default.svc.cluster.local
+            subset: new
+          weight: 10
+---
+kind: DestinationRule
+apiVersion: networking.istio.io/v1alpha3
+metadata:
+  name: pricing-service
+spec:
+  host: pricing-service.default.svc.cluster.local
+  subsets:
+    - labels:
+        version: old
+      name: old
+    - labels:
+        version: new
+      name: new
